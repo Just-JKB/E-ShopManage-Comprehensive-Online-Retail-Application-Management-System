@@ -1,61 +1,71 @@
-/* style.css */
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
+/* Reset and Base */
 body {
+    background: #f0f2f5;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     height: 100vh;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-form {
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    text-align: center; /* center the content inside the form */
-}
-
-h2 {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+/* Shared Box Styling (for login and dashboards) */
+.box {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    width: 320px;
     text-align: center;
 }
 
-input[type="text"],
-input[type="password"] {
-    width: 90%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-align: center; /* center the text inside inputs */
+/* Headings */
+h1, h2 {
+    margin-bottom: 25px;
+    color: #333;
 }
 
+/* Inputs */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Submit Button */
 input[type="submit"] {
-    width: 90%;
-    padding: 10px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
     background-color: #007bff;
     color: white;
+    font-size: 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
     background-color: #0056b3;
+}
+
+/* Logout Link */
+.logout-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    text-decoration: none;
+    background: #d9534f;
+    color: white;
+    border-radius: 8px;
+}
+
+.logout-link:hover {
+    background: #c9302c;
 }

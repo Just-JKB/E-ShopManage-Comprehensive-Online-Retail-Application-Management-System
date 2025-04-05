@@ -1,23 +1,28 @@
 <?php
-// login.php
-
 session_start();
 
-// Hardcoded username and password
-$valid_username = "admin";
-$valid_password = "name"; // In real apps, use hashed passwords
+// Dummy users: username => [password, role]
+$users = [
+    "admin" => ["admin", "admin"],
+    "customer" => ["customer", "customer"]
+];
 
-// Get form data
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Check credentials
-if ($username === $valid_username && $password === $valid_password) {
+if (isset($users[$username]) && $users[$username][0] === $password) {
     $_SESSION['username'] = $username;
-    echo "Login successful! Welcome, $username.";
-    // Redirect to protected page if needed
-    // header("Location: dashboard.php");
+    $_SESSION['role'] = $users[$username][1];
+
+    if ($_SESSION['role'] === "admin") {
+        header("Location: admin.php");
+        exit();
+    } else {
+        header("Location: dashboard.php");
+        exit();
+    }
 } else {
-    echo "Invalid username or password.";
+    echo "<h3>Invalid username or password!</h3>";
 }
 ?>
+
