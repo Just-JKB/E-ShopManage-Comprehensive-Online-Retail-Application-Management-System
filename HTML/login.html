@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Shop Login</title>
+    <link rel="stylesheet" href="../CSS/login.css">
+    <script src="../JS/login.js" defer></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <h2>Select Role</h2>
+    <div>
+        <i class="fas fa-user role-icon" id="user-icon" onclick="selectRole('user')" title="User"></i>
+        <i class="fas fa-user-shield role-icon" id="admin-icon" onclick="selectRole('admin')" title="Admin"></i>
+    </div>
+
+    <h3 id="login-message">Please select a role</h3>
+
+    <form action="login.php" method="POST" onsubmit="return validateForm()">
+        <input type="hidden" name="role" id="selected-role">
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <input type="submit" value="Login">
+    </form>
+
+    <p>Don't have an account? <a href="../HTML/register.html">Create one here</a></p>
+
+</body>
+</html>
