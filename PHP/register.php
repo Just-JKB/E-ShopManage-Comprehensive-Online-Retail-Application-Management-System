@@ -1,7 +1,8 @@
 <?php
-require_once '../PHP/dbConnection.php'; // Make sure this path is correct
+require_once '../PHP/dbConnection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $role = $_POST['role'];
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -15,14 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-    // Connect using the Database class
     $database = new Database();
     $conn = $database->getConnection();
 
     try {
-        // Call the stored procedure using PDO
-        $stmt = $conn->prepare("CALL RegisterUser(:name, :email, :password, :contact, :address)");
+        if ($role === 'user') {
+            $stmt = $conn->prepare("CALL RegisterUser(:name, :email, :password, :contact, :address)");
+        } elseif ($role === 'admin') {
+            $stmt = $conn->prepare("CALL RegisterAdmin(:name, :email, :password, :contact, :address)");
+        } else {
+            echo "Invalid role selected.";
+            exit();
+        }
+
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', $hashed_password);
@@ -30,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':address', $address);
 
         $stmt->execute();
-        echo "Account created successfully! <a href='../HTML/login.html'>Login here</a>";
+        echo "Account created successfully as <strong>$role</strong>! <a href='../HTML/login.html'>Login here</a>";
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
