@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <link rel="stylesheet" href="../CSS/loginn.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Order Form</h1>
+        <div id="successMessage" class="success-message">
+            Thank you for your order! We've received your details and will process your order shortly.
+        </div>
+        <form id="orderForm" action="/submit-order" method="POST">
+            <div class="form-group">
+                <label for="name" class="required">Full Name</label>
+                <input type="text" id="name" name="name" required>
+                <div class="error-message" id="nameError">Please enter your full name</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="required">Email</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error-message" id="emailError">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+                <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address" class="required">Shipping Address</label>
+                <textarea id="address" name="address" rows="4" required></textarea>
+                <div class="error-message" id="addressError">Please enter your shipping address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="product" class="required">Product</label>
+                <select id="product" name="product" required>
+                    <option value="">-- Select a Product --</option>
+                    <option value="product1" data-price="19.99">Product 1 - $19.99</option>
+                    <option value="product2" data-price="29.99">Product 2 - $29.99</option>
+                    <option value="product3" data-price="39.99">Product 3 - $39.99</option>
+                </select>
+                <div class="error-message" id="productError">Please select a product</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity" class="required">Quantity</label>
+                <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+                <div class="error-message" id="quantityError">Please enter a valid quantity (minimum 1)</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Payment Method</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="credit" name="payment" value="credit" checked>
+                        <label for="credit">Credit Card</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="paypal" name="payment" value="paypal">
+                        <label for="paypal">PayPal</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="bank" name="payment" value="bank">
+                        <label for="bank">Bank Transfer</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Special Instructions</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Any special delivery instructions or notes..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <div class="price-display" id="totalPrice">Total: $0.00</div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" id="submitBtn">Place Order</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../JS/login.js"></script>
+</body>
+</html>
