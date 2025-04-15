@@ -1,50 +1,20 @@
-.search-container input,
-.search-container select {
-  min-width: 250px;
-  max-width: 300px;
-  padding: 10px 16px;
-  font-size: 16px;
-  border-radius: 8px;
-  transition: 0.3s ease;
+.sidebar {
+  width: 200px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  border-right: 2px solid #dee2e6;
 }
-
-.search-container input:focus,
-.search-container select:focus {
-  box-shadow: 0 0 6px rgba(52, 73, 94, 0.2);
-  border-color: #495057;
+.sidebar .btn {
+  width: 100%;
+  border-radius: 0;
+  border-bottom: 1px solid #dee2e6;
+  text-align: left;
 }
-
-/* Header Styles */
-.navbar {
-    border-bottom: 2px solid #f1f1f1;
-    background-color: #ffffff;
-  }
-  
-  .navbar-brand img {
-    max-height: 50px;
-    margin-right: 10px;
-  }
-  
-  .navbar .btn-outline-secondary {
-    padding: 0;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .navbar .btn-outline-secondary img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  /* Table header */
-  .table-dark th {
-    background-color: #2c3e50;
-    color: white;
-  }
-  
-  .table-hover tbody tr:hover {
-    background-color: #ecf0f1;
-  }
-  
+.product-card img {
+  width: 100%;
+  height: auto;
+}
+.product-name {
+  text-align: center;
+  margin-top: 0.5rem;
+}
