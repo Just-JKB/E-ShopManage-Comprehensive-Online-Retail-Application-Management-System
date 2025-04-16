@@ -1,38 +1,88 @@
-form.addEventListener('submit', function (e) {
+document.addEventListener("DOMContentLoaded", () => {
+  // Check if redirected after adding a product
+  const urlParams = new URLSearchParams(window.location.search);
+  const added = urlParams.get("added");
+
+  if (added === "true") {
+      const banner = document.getElementById("successBanner");
+      if (banner) {
+          banner.style.display = "block";
+
+          // Hide banner after 3 seconds
+          setTimeout(() => {
+              banner.style.display = "none";
+          }, 3000);
+      }
+  }
+
+  // Load products from DB if needed
+  fetchProducts();
+
+  // Optional: hook up category buttons, sorting, etc.
+});
+
+async function fetchProducts() {
+  try {
+      const response = await fetch("../PHP/GetProducts.php"); // Make sure this PHP file exists
+      const products = await response.json();
+
+      const productGrid = document.getElementById("productGrid");
+
+      // Clear current products except the Add Product card
+      productGrid.innerHTML = document.getElementById("addProductCard").outerHTML;
+
+      products.forEach(product => {
+          const productCard = document.createElement("div");
+          productCard.className = "col-6 col-md-4 col-lg-3";
+          productCard.innerHTML = `
+              <div class="card h-100 shadow-sm">
+                  <img src="${product.image_url}" class="card-img-top" alt="${product.name}">
+                  <div class="card-body">
+                      <h5 class="card-title">${product.name}</h5>
+                      <p class="card-text">${product.description}</p>
+                      <p class="card-text"><strong>₱${product.price}</strong></p>
+                      <span class="badge bg-secondary">${product.category}</span>
+                  </div>
+              </div>
+          `;
+          productGrid.appendChild(productCard);
+      });
+
+  } catch (error) {
+      console.error("Failed to fetch products:", error);
+  }
+}
+
+// Add product form handler
+document.getElementById("addProductForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const name = document.getElementById('productName').value;
-  const img = document.getElementById('productImage').value;
-  const category = document.getElementById('productCategory').value;
+  const formData = new FormData(this);
 
-  const newCard = document.createElement('div');
-  newCard.className = 'col-6 col-md-4 col-lg-3 product-item';
-  newCard.setAttribute('data-category', category);
-  newCard.innerHTML = `
-    <div class="border rounded p-3 bg-white shadow-sm h-100 d-flex flex-column">
-      <img src="${img}" alt="${name}" class="img-fluid mb-2 rounded" style="height:180px; object-fit:cover;">
-      <h6 class="mb-1">${name}</h6>
-      <p class="text-muted small mb-2">Size: M | Color: Black</p>
-      <p class="mb-2 fw-bold">$39.99</p>
-      <div class="mt-auto d-flex justify-content-between">
-        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="new" data-bs-toggle="modal" data-bs-target="#editProductModal">Edit</button>
-        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="new">Delete</button>
-      </div>
-    </div>
-  `;
+  try {
+      const response = await fetch("../PHP/Inventory.php", {
+          method: "POST",
+          body: formData
+      });
 
-  productGrid.insertBefore(newCard, addCard);
-  form.reset();
+      const result = await response.json();
 
-  const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-  modal.hide();
-  applyFilters();
+      if (result.success) {
+          Swal.fire({
+              title: "Success",
+              text: "Product added successfully!",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+          }).then(() => {
+              window.location.href = "Inventory.html?added=true";
+          });
+      } else {
+          Swal.fire("Error", result.message || "Failed to add product", "error");
+      }
 
-  Swal.fire({
-    icon: 'success',
-    title: 'Product Added!',
-    text: `"${name}" has been successfully added.`,
-    showConfirmButton: false,
-    timer: 2000
-  });
+  } catch (error) {
+      console.error("Fetch error:", error);
+      Swal.fire("Error", "An error occurred", "error");
+  }
 });

@@ -1,19 +1,42 @@
 <?php
-require_once '../PHP/dbConnection.php';
-require_once '../PHP/crud.php'; 
+require_once 'dbConnection.php';
+require_once 'InsertFunction.php'; // contains your Insert() function
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_name = $_POST['productName'];
-    $category_id = $_POST['productCategory'];
-    $size = $_POST['productSize'] ?? 'M';
-    $color = $_POST['productColor'] ?? 'Black';
-    $price = $_POST['productPrice'] ?? 0;
-    $stock_quantity = $_POST['productStock'] ?? 0;
-    $description = $_POST['productDescription'] ?? '';
-    $image_url = $_POST['productImage'];
+header('Content-Type: application/json');
 
-    $crud = new Crud(); 
-    $crud->InsertProducts($product_name, $category_id, $size, $color, $price, $stock_quantity, $description, $image_url);
-    exit();
+// Create database connection
+$db = new Database();
+$conn = $db->getConnection();
+
+// Insert new product
+if (
+    isset($_POST['productName'], $_POST['productCategory'], $_POST['productSize'], $_POST['productColor'],
+          $_POST['productPrice'], $_POST['productStock'], $_POST['productDescription'], $_POST['productImage'])
+) {
+    $success = Insert(
+        $_POST['productName'],
+        $_POST['productCategory'],
+        $_POST['productSize'],
+        $_POST['productColor'],
+        $_POST['productPrice'],
+        $_POST['productStock'],
+        $_POST['productDescription'],
+        $_POST['productImage']
+    );
+
+    if ($success) {
+        // Now fetch all products from the DB
+        $stmt = $conn->prepare("SELECT * FROM products"); // Use your actual products table name
+        $stmt->execute();
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            "success" => true,
+            "products" => $products
+        ]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Insert failed."]);
+    }
+} else {
+    echo json_encode(["success" => false, "message" => "Missing fields."]);
 }
-?>
