@@ -1,8 +1,27 @@
 <?php
 require_once '../PHP/dbConnection.php';
 
+function validatePasswords($password, $confirm_password) {
+    if ($password !== $confirm_password) {
+        return "Passwords do not match!";
+    }
+    return null;
+}
+
+function registerAccount($conn, $name, $email, $hashed_password, $contact_number, $address) {
+    $stmt = $conn->prepare("CALL RegisterUser(:name, :email, :password, :contact, :address)");
+
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':password', $hashed_password);
+    $stmt->bindParam(':contact', $contact_number);
+    $stmt->bindParam(':address', $address);
+    $stmt->execute();
+
+    return true;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $role = $_POST['role'];
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -10,33 +29,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    if ($password !== $confirm_password) {
-        echo "Passwords do not match!";
+    $error = validatePasswords($password, $confirm_password);
+    if ($error) {
+        echo $error;
         exit();
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
     $database = new Database();
     $conn = $database->getConnection();
 
     try {
-        if ($role === 'user') {
-            $stmt = $conn->prepare("CALL RegisterUser(:name, :email, :password, :contact, :address)");
-        } elseif ($role === 'admin') {
-            $stmt = $conn->prepare("CALL RegisterAdmin(:name, :email, :password, :contact, :address)");
+        $result = registerAccount($conn, $name, $email, $hashed_password, $contact_number, $address);
+
+        if ($result === true) {
+            echo "Account created successfully! <a href='../HTML/login.html'>Login here</a>";
         } else {
-            echo "Invalid role selected.";
-            exit();
+            echo $result;
         }
-
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':password', $hashed_password);
-        $stmt->bindParam(':contact', $contact_number);
-        $stmt->bindParam(':address', $address);
-
-        $stmt->execute();
-        echo "Account created successfully as <strong>$role</strong>! <a href='../HTML/login.html'>Login here</a>";
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
