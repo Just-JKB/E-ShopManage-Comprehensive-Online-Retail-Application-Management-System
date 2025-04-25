@@ -3,19 +3,34 @@ require_once 'dbConnection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get all POST values
-    $product_name     = $_POST['productName'];
-    $category_id      = $_POST['productCategory'];
-    $size             = $_POST['productSize'];
-    $color            = $_POST['productColor'];
-    $price            = $_POST['productPrice'];
-    $stock_quantity   = $_POST['productStock'];
-    $description      = $_POST['productDescription'];
-    $image_url        = $_POST['productImage'];
+    $product_name     = $_POST['productName'] ?? '';
+    $category_id      = $_POST['productCategory'] ?? '';
+    $size             = $_POST['productSize'] ?? '';
+    $color            = $_POST['productColor'] ?? '';
+    $price            = $_POST['productPrice'] ?? '';
+    $stock_quantity   = $_POST['productStock'] ?? '';
+    $description      = $_POST['productDescription'] ?? '';
+
+    // Handle image URL
+    $image_url = '';
+    if (isset($_FILES['productImage']) && $_FILES['productImage']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../uploads/';
+        $file_name = time() . '_' . basename($_FILES['productImage']['name']);
+        $target_file = $upload_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['productImage']['tmp_name'], $target_file)) {
+            $image_url = 'uploads/' . $file_name;
+        }
+    } else if (isset($_POST['productImage']) && !empty($_POST['productImage'])) {
+        $image_url = $_POST['productImage'];
+    }
 
     // Call the insert function
     $result = Insert($product_name, $category_id, $size, $color, $price, $stock_quantity, $description, $image_url);
 
-    echo $result; // JSON response already built in function
+    // Set JSON header and return clean response
+    header('Content-Type: application/json');
+    echo json_encode($result);
     exit;
 }
 
@@ -28,34 +43,44 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             throw new Exception("Database connection failed.");
         }
 
-        $stmt = $conn->prepare("CALL InsertProduct(:p_name, :p_category_id, :p_size, :p_color, :p_price, :p_stock_quantity, :p_description, :p_image_url)");
-
+        $stmt = $conn->prepare("CALL InsertProducts(:p_name, :p_category_id, :p_size, :p_color, :p_price, :p_stock_quantity, :p_description, :p_image_url)");
         $stmt->execute([
-            ':p_name'            => $product_name,
-            ':p_category_id'     => $category_id,
-            ':p_size'            => $size,
-            ':p_color'           => $color,
-            ':p_price'           => $price,
-            ':p_stock_quantity'  => $stock_quantity,
-            ':p_description'     => $description,
-            ':p_image_url'       => $image_url
+            ':p_name' => $product_name,
+            ':p_category_id' => $category_id,
+            ':p_size' => $size,
+            ':p_color' => $color,
+            ':p_price' => $price,
+            ':p_stock_quantity' => $stock_quantity,
+            ':p_description' => $description,
+            ':p_image_url' => $image_url
         ]);
 
+        // Get last inserted ID
+        $product_id = $conn->lastInsertId();
 
-        return json_encode([
+        // Fetch inserted product
+        $productStmt = $conn->prepare("SELECT * FROM products WHERE product_id = :product_id");
+        $productStmt->execute([':product_id' => $product_id]);
+        $product = $productStmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
             'success' => true,
+            'product' => $product,
             'message' => '✅ Product inserted successfully.'
-        ]);
+        ];
+
     } catch (PDOException $e) {
-        return json_encode([
+        error_log("Database Error: " . $e->getMessage());
+        return [
             'success' => false,
             'message' => '❌ Database Error: ' . $e->getMessage()
-        ]);
+        ];
     } catch (Exception $e) {
-        return json_encode([
+        error_log("Error: " . $e->getMessage());
+        return [
             'success' => false,
             'message' => '❌ Error: ' . $e->getMessage()
-        ]);
+        ];
     }
 }
-?>
+

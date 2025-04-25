@@ -96,17 +96,23 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="inventory.php">
-                                <i class="fas fa-boxes me-2"></i>
-                                Inventory Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="users.php">
-                                <i class="fas fa-users me-2"></i>
-                                User Management
-                            </a>
-                        </li>
+                            <a class="nav-link" href="../PHP/inventoryyy.php">
+                                    <i class="fas fa-boxes me-2"></i>
+                                    Inventory Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../PHP/inventory.php">
+                                    <i class="fas fa-shopping-cart me-2"></i>
+                                    Product Management
+                                </a> 
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../PHP/users.php">
+                                    <i class="fas fa-users me-2"></i>
+                                    User Management
+                                </a>
+                            </li>
                         <li class="nav-item mt-5">
                             <a class="nav-link text-danger" href="logout.php">
                                 <i class="fas fa-sign-out-alt me-2"></i>
