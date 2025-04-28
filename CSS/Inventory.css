@@ -1,26 +1,69 @@
-.sidebar {
-  width: 200px;
+/* Sidebar Styles */
+#sidebar {
+  width: 250px;
   min-height: 100vh;
-  background-color: #f8f9fa;
-  border-right: 2px solid #dee2e6;
+  background-color: #212529;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
 }
-.sidebar .btn {
-  width: 100%;
+
+#sidebar .sidebar-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .sidebar-header h3 {
+  font-size: 18px;
+  margin: 0;
+  padding: 10px 0;
+}
+
+#sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 15px;
   border-radius: 0;
-  border-bottom: 1px solid #dee2e6;
-  text-align: left;
+  margin: 0;
+  transition: all 0.3s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
 }
+
+#sidebar .nav-link i {
+  font-size: 14px;
+  width: 20px;
+}
+
+#sidebar .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .nav-link.active {
+  color: #fff;
+  background-color: rgba(60, 60, 60, 0.5);
+}
+
+#main-content {
+  margin-left: 250px;
+  padding: 20px;
+}
+
+/* Product Management Styles */
 .product-card img {
   width: 100%;
   height: auto;
 }
+
 .product-name {
   text-align: center;
   margin-top: 0.5rem;
 }
 
 #productSearch {
-  max-width: 300px;  /* Controls the size of the input */
+  max-width: 300px; /* Controls the size of the input */
 }
 
 #searchBtn {
@@ -53,4 +96,90 @@
 
 .product-item .btn {
   min-width: 48%;
+}
+
+/* Card styles */
+.card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Modal styles */
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Success banner */
+#successBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+    position: relative;
+    min-height: auto;
+  }
+
+  #main-content {
+    margin-left: 0;
+  }
+
+  .card-img-top {
+    height: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #sortSelect,
+  #filterSelect {
+    width: 100% !important;
+  }
+}
+
+#successBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  padding: 15px;
+  text-align: center;
+  animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
 }

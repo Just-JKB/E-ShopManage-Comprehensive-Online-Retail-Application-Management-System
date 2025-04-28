@@ -56,13 +56,15 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
         ]);
 
         // Get last inserted ID
-        $product_id = $conn->lastInsertId();
-
-        // Fetch inserted product
-        $productStmt = $conn->prepare("SELECT * FROM products WHERE product_id = :product_id");
-        $productStmt->execute([':product_id' => $product_id]);
-        $product = $productStmt->fetch(PDO::FETCH_ASSOC);
-
+        // 🔥 Immediately fetch inserted product INSIDE the stored procedure
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$product) {
+            // No product fetched, but insert might still have succeeded
+            return [
+                'success' => true,
+                'message' => '✅ Product inserted successfully (no product returned).'
+            ];
+        }
         return [
             'success' => true,
             'product' => $product,
