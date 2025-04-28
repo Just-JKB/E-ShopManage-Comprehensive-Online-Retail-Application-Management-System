@@ -1,73 +1,81 @@
-// Product Form Submission
-document.getElementById('addProductForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Show loading state
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
-    submitBtn.disabled = true;
+document.addEventListener('DOMContentLoaded', function() {
+    // Product Form Submission
+    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
+        submitBtn.disabled = true;
 
-    try {
-        const formData = new FormData(this);
-        formData.append('action', 'insert'); // (Optional) Add action identifier
-        
-        const response = await fetch('../PHP/insertFunction.php', {  // Updated to call insertFunction.php
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Show success message
-            const successBanner = document.getElementById('successBanner');
-            successBanner.style.display = 'block';
-            successBanner.textContent = result.message;
+        try {
+            const formData = new FormData(this);
             
-            // Hide the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-            modal.hide();
-            
-            // Add the new product to the grid
-            addProductToGrid(result.product);
-            
-            // Hide success message after 3 seconds
-            setTimeout(() => {
-                successBanner.style.display = 'none';
-            }, 3000);
-            
-            // Reset the form
-            this.reset();
-        } else {
+            const response = await fetch(this.action, {
+                method: this.method,
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Server response:', result);
+
+            if (result.success) {
+                // Show success SweetAlert
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Product Added!',
+                    text: result.message || 'The product was successfully added.',
+                    confirmButtonColor: '#28a745', // green button
+                    confirmButtonText: 'OK'
+                });
+
+                // Hide modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                if (modal) modal.hide();
+                this.reset();
+
+                // Add product to grid
+                if (result.product && result.product.product_id) {
+                    addProductToGrid(result.product);
+                }
+            } else {
+                // Show error SweetAlert
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Add Product',
+                    text: result.message || 'Please try again.',
+                    confirmButtonColor: '#dc3545', // red button
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: result.message || 'Failed to add product',
-                confirmButtonColor: '#3085d6'
+                title: 'Error!',
+                text: error.message || 'An unexpected error occurred. Please try again.',
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'OK'
             });
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while adding the product. Please try again.',
-            confirmButtonColor: '#3085d6'
-        });
-    } finally {
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
-    }
+    });
 });
 
 // Function to add new product to the grid dynamically
 function addProductToGrid(product) {
     const productGrid = document.getElementById('productGrid');
+    
+    // Create image URL - handle backslashes for Windows paths
+    const imageUrl = product.image_url 
+        ? '../' + product.image_url.replace(/\\/g, '/') 
+        : '../images/default-product.jpg';
 
     const col = document.createElement('div');
     col.className = 'col-6 col-md-4 col-lg-3 product-card';
@@ -75,12 +83,12 @@ function addProductToGrid(product) {
 
     col.innerHTML = `
         <div class="card shadow-sm h-100">
-            <img src="../${product.image_url || 'images/default-product.jpg'}" 
+            <img src="${imageUrl}" 
                 class="card-img-top" 
                 alt="${product.product_name || 'Product image'}">
             <div class="card-body">
                 <h5 class="card-title">${product.product_name || 'Unknown Product'}</h5>
-                <p class="card-text">₱${parseFloat(product.price).toFixed(2)}</p>
+                <p class="card-text">₱${parseFloat(product.price || 0).toFixed(2)}</p>
                 <div class="d-flex justify-content-between">
                     <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal">
                         <i class="fas fa-edit"></i> Edit
@@ -93,12 +101,11 @@ function addProductToGrid(product) {
         </div>
     `;
 
-    // Insert before the "Add Product" card
     const addProductCard = document.getElementById('addProductCard');
     productGrid.insertBefore(col, addProductCard);
 }
 
-// Delete product placeholder function (for SweetAlert confirmation)
+// Delete product function
 function deleteProduct(productId) {
     Swal.fire({
         title: 'Are you sure?',
@@ -110,7 +117,6 @@ function deleteProduct(productId) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Just remove from DOM for now (you can enhance later with AJAX delete)
             const productCard = document.querySelector(`[data-product-id="${productId}"]`);
             if (productCard) {
                 productCard.remove();
