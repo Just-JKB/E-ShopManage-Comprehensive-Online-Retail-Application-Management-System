@@ -43,6 +43,7 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             throw new Exception("Database connection failed.");
         }
 
+        // Prepare CALL to InsertProducts
         $stmt = $conn->prepare("CALL InsertProducts(:p_name, :p_category_id, :p_size, :p_color, :p_price, :p_stock_quantity, :p_description, :p_image_url)");
         $stmt->execute([
             ':p_name' => $product_name,
@@ -55,20 +56,23 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             ':p_image_url' => $image_url
         ]);
 
-        // Get last inserted ID
-        $product_id = $conn->lastInsertId();
+        // 🔥 Immediately fetch inserted product INSIDE the stored procedure
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch inserted product
-        $productStmt = $conn->prepare("SELECT * FROM products WHERE product_id = :product_id");
-        $productStmt->execute([':product_id' => $product_id]);
-        $product = $productStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$product) {
+            // No product fetched, but insert might still have succeeded
+            return [
+                'success' => true,
+                'message' => '✅ Product inserted successfully (no product returned).'
+            ];
+        }
+        
 
         return [
             'success' => true,
             'product' => $product,
             'message' => '✅ Product inserted successfully.'
         ];
-
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         return [
