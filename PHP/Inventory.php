@@ -503,6 +503,41 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('productSearch');
+    const searchButton = document.getElementById('searchBtn');
+    const productCards = document.querySelectorAll('.product-card');
+
+    // Filter function
+    function filterProducts() {
+        const searchValue = searchInput.value.toLowerCase().trim();
+
+        productCards.forEach(card => {
+            const productName = card.querySelector('.card-title').textContent.toLowerCase();
+
+            if (productName.includes(searchValue)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Trigger on button click
+    searchButton.addEventListener('click', filterProducts);
+
+    // Optional: Trigger search on "Enter" key press
+    searchInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            filterProducts();
+        }
+    });
+
+    // Keep your existing form submission and delete logic here...
+});
+
 </script>
 
 </body>
