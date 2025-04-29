@@ -1,0 +1,93 @@
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* deep blue gradient */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+/* Container Styles */
+.container {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Heading */
+h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+    color: #1e3c72;
+    letter-spacing: 0.5px;
+}
+
+/* Labels & Inputs */
+.form-label {
+    font-weight: 500;
+    color: #1e3c72;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    transition: border 0.3s, box-shadow 0.3s;
+    font-size: 15px;
+}
+
+.form-control:focus {
+    border-color: #2a5298;
+    box-shadow: 0 0 5px rgba(42, 82, 152, 0.3);
+    outline: none;
+}
+
+/* Button */
+.btn-primary {
+    background-color: #2a5298;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #1e3c72;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
