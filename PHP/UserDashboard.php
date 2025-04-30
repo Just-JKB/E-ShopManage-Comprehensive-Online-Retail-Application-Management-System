@@ -89,15 +89,43 @@ $conn = null;
             text-align: center;
             margin-bottom: 10px;
         }
+        .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>User Dashboard</h1>
-    <a href="OrderDashboard.php" class="order-button">Orders</a>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="OrderDashboard.php" class="order-button">Order-List</a>
+        <a href="UserProfile.php" class="profile-link">
+            <div class="profile-header">
+                <img src="images/profile.png" alt="Profile" class="profile-img">
+            </div>
+        </a>
+    </div>
 </div>
-
 <div class="product-grid">
     <?php foreach ($products as $product): ?>
         <div class="product-card" data-product-id="<?= $product['product_id'] ?>">
