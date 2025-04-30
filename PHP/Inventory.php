@@ -138,7 +138,7 @@ echo ' -->';
 </head>
 <body>
     <div id="successBanner" class="alert alert-success text-center m-0" style="display: none;">
-        ✅ Product added successfully!
+         Product added successfully!
     </div>
 
     <div class="container-fluid">
