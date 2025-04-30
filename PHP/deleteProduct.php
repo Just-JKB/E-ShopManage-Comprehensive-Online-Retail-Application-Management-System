@@ -23,15 +23,15 @@ try {
     // Create database connection
     $db = new Database();
     $conn = $db->getConnection();
-    
+
     if (!$conn) {
         throw new Exception("Database connection failed");
     }
-    
+
     // Prepare and execute delete statement
     $stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
     $stmt->execute([$product_id]);
-    
+
     // Check if any rows were affected
     if ($stmt->rowCount() > 0) {
         echo json_encode([

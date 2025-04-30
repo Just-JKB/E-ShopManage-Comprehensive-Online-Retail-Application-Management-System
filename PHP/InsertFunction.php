@@ -56,9 +56,9 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             ':p_image_url' => $image_url
         ]);
 
+        // Get last inserted ID
         // 🔥 Immediately fetch inserted product INSIDE the stored procedure
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if (!$product) {
             // No product fetched, but insert might still have succeeded
             return [
@@ -66,8 +66,6 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
                 'message' => '✅ Product inserted successfully (no product returned).'
             ];
         }
-        
-
         return [
             'success' => true,
             'product' => $product,

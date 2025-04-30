@@ -325,10 +325,10 @@ echo ' -->';
                             <input type="text" class="form-control" id="productColor" name="productColor" required>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="productStock" class="form-label">Stock Quantity</label>
-                            <input type="number" class="form-control" id="productStock" name="productStock" required>
-                        </div>
+            <div class="mb-3">
+              <label for="productStock" class="form-label">Stock Quantity</label>
+              <input type="number" class="form-control" id="productStock" name="productStock" required>
+            </div>
 
                         <div class="mb-3">
                             <label for="productImage" class="form-label">Product Image</label>
@@ -336,209 +336,36 @@ echo ' -->';
                         </div>
                     </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Add Product</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Add Product</button>
+          </div>
+        </form>
+      </div>
     </div>
-                            
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-// Wait for page to fully load
-document.addEventListener('DOMContentLoaded', function () {
-    // Product Form Submission
-    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
-        submitBtn.disabled = true;
+  </div>
 
-        try {
-            const formData = new FormData(this);
-            
-            const response = await fetch(this.action, {
-                method: this.method,
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log('Server response:', result);
-
-            if (result.success) {
-                // Show success SweetAlert
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Product Added!',
-                    text: result.message || 'The product was successfully added.',
-                    confirmButtonColor: '#28a745', // green button
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Refresh the page after clicking OK
-                    window.location.reload();
-                });
-
-                // Hide modal and reset form
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-                if (modal) modal.hide();
-                this.reset();
-            } else {
-                // Show error SweetAlert
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Failed to Add Product',
-                    text: result.message || 'Please try again.',
-                    confirmButtonColor: '#dc3545', // red button
-                    confirmButtonText: 'OK'
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: error.message || 'An unexpected error occurred. Please try again.',
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'OK'
-            });
-        } finally {
-            submitBtn.innerHTML = originalBtnText;
-            submitBtn.disabled = false;
-        }
-    });
-
-    // Add event listeners to all delete buttons
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            deleteProduct(productId);
-        });
-    });
-
-    // Delete product function
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Delete Product function (placeholder)
     function deleteProduct(productId) {
-        console.log('Delete product called with ID:', productId);
-        
-        if (!productId) {
-            console.error('No product ID provided');
-            return;
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this product!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Simulate product deletion
+          document.querySelector(`[data-product-id="${productId}"]`).remove();
+          Swal.fire('Deleted!', 'The product has been deleted.', 'success');
         }
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this product!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Show loading state
-                Swal.fire({
-                    title: 'Deleting...',
-                    text: 'Please wait',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('product_id', productId);
-                
-                // Send delete request
-                fetch('../PHP/deleteProduct.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Delete response:', data);
-                    
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: data.message || 'Product has been deleted.',
-                            confirmButtonColor: '#28a745'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: data.message || 'Failed to delete product.',
-                            confirmButtonColor: '#dc3545'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'An error occurred while deleting the product.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                });
-            }
-        });
+      });
     }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('productSearch');
-    const searchButton = document.getElementById('searchBtn');
-    const productCards = document.querySelectorAll('.product-card');
-
-    // Filter function
-    function filterProducts() {
-        const searchValue = searchInput.value.toLowerCase().trim();
-
-        productCards.forEach(card => {
-            const productName = card.querySelector('.card-title').textContent.toLowerCase();
-
-            if (productName.includes(searchValue)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    // Trigger on button click
-    searchButton.addEventListener('click', filterProducts);
-
-    // Optional: Trigger search on "Enter" key press
-    searchInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            filterProducts();
-        }
-    });
-
-    // Keep your existing form submission and delete logic here...
-});
-
-</script>
-
+  </script>
 </body>
 </html>
