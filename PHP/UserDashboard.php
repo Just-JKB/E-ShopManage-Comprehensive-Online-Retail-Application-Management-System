@@ -23,13 +23,15 @@ $conn = null;
             font-family: Arial, sans-serif;
             background: #f4f4f4;
             margin: 0;
-            padding: 20px;  
+            padding: 20px;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .order-button {
             padding: 10px 20px;
             background: #4CAF50;
@@ -40,15 +42,18 @@ $conn = null;
             border-radius: 5px;
             cursor: pointer;
         }
+
         .order-button:hover {
             background: #45a049;
         }
+
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
+
         .product-card {
             background: white;
             border-radius: 8px;
@@ -56,25 +61,33 @@ $conn = null;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: 0.3s;
         }
+
         .product-card:hover {
             box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
-        .product-image {
+
+        .product-card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
         }
+
         .product-details {
             padding: 15px;
         }
+
         .product-name {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
         }
+
         .product-price {
             color: #888;
             font-size: 16px;
+            text-align: center;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -87,46 +100,49 @@ $conn = null;
 
 <div class="product-grid">
     <?php foreach ($products as $product): ?>
-        <?php 
-            $image = !empty($product['image_url']) ? htmlspecialchars($product['image_url']) : 'images/default.png';
-        ?>
-        <div class="product-card">
-            <img src="<?php echo $image; ?>" alt="Product Image" class="product-image">
+        <div class="product-card" data-product-id="<?= $product['product_id'] ?>">
+            <img src="<?= '../' . htmlspecialchars($product['image_url'] ?? 'images/default-product.jpg') ?>" 
+                alt="<?= htmlspecialchars($product['product_name']) ?>">
             <div class="product-details">
-                <div class="product-name"><?php echo htmlspecialchars($product['product_name']); ?></div>
-                <div class="product-price">$<?php echo number_format($product['price'], 2); ?></div>
-                <!-- Order button added inside the product card -->
-                <button class="order-button" onclick="addToCart(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['product_name']); ?>', <?php echo $product['price']; ?>)">Order</button>
+                <div class="product-name"><?= htmlspecialchars($product['product_name']) ?></div>
+                <div class="product-price">₱<?= number_format($product['price'], 2) ?></div>
+                <button class="order-button" onclick="orderNow(<?= $product['product_id'] ?>, '<?= addslashes($product['product_name']) ?>', <?= $product['price'] ?>)">Order</button>
             </div>
         </div>
     <?php endforeach; ?>
 </div>
 
 <script>
-    // JavaScript function to add product to cart
-    let cart = [];
-
-    function addToCart(productId, productName, price) {
-        const product = {
-            productId: productId,
-            productName: productName,
-            price: price,
-            quantity: 1 // Initially add 1 product
+    function orderNow(productId, productName, price) {
+        const orderData = {
+            user_id: 1, // Replace with session user ID if needed
+            total_price: price,
+            order_items: [
+                {
+                    product_id: productId,
+                    quantity: 1,
+                    price: price
+                }
+            ]
         };
 
-        // Check if the product already exists in the cart
-        const existingProduct = cart.find(item => item.productId === productId);
-
-        if (existingProduct) {
-            // If product exists, increase quantity
-            existingProduct.quantity += 1;
-        } else {
-            // Add new product to the cart
-            cart.push(product);
-        }
-
-        // Show success message
-        alert(`${productName} has been added to your cart!`);
+        fetch('PlaceOrder.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`${productName} ordered successfully! Order ID: ${data.order_id}`);
+                window.location.href = 'OrderDashboard.php';
+            } else {
+                alert('Order failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Order error: ' + error);
+        });
     }
 </script>
 
