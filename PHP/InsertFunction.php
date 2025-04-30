@@ -43,6 +43,7 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             throw new Exception("Database connection failed.");
         }
 
+        // Prepare CALL to InsertProducts
         $stmt = $conn->prepare("CALL InsertProducts(:p_name, :p_category_id, :p_size, :p_color, :p_price, :p_stock_quantity, :p_description, :p_image_url)");
         $stmt->execute([
             ':p_name' => $product_name,
@@ -70,7 +71,6 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             'product' => $product,
             'message' => '✅ Product inserted successfully.'
         ];
-
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         return [
