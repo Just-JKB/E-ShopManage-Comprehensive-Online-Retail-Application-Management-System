@@ -325,10 +325,10 @@ echo ' -->';
                             <input type="text" class="form-control" id="productColor" name="productColor" required>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="productStock" class="form-label">Stock</label>
-                            <input type="number" class="form-control" id="productStock" name="productStock" required>
-                        </div>
+            <div class="mb-3">
+              <label for="productStock" class="form-label">Stock Quantity</label>
+              <input type="number" class="form-control" id="productStock" name="productStock" required>
+            </div>
 
                         <div class="mb-3">
                             <label for="productImage" class="form-label">Product Image</label>
@@ -336,79 +336,36 @@ echo ' -->';
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add Product</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Add Product</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/font-awesome"></script>
-
-    <script>
-        // Handle form submission and product adding
-        document.getElementById('addProductForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
-            submitBtn.disabled = true;
-
-            try {
-                const formData = new FormData(this);
-
-                const response = await fetch(this.action, {
-                    method: this.method,
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Success
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Product Added!',
-                        text: result.message || 'The product was successfully added.',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Reload the page
-                        window.location.reload();
-                    });
-                } else {
-                    // Error
-                    await Swal.fire({
-                        icon: 'error',
-                        title: 'Failed to Add Product',
-                        text: result.message || 'Please try again.',
-                        confirmButtonColor: '#dc3545',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: error.message || 'An unexpected error occurred. Please try again.',
-                    confirmButtonColor: '#dc3545',
-                    confirmButtonText: 'OK'
-                });
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Delete Product function (placeholder)
+    function deleteProduct(productId) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this product!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Simulate product deletion
+          document.querySelector(`[data-product-id="${productId}"]`).remove();
+          Swal.fire('Deleted!', 'The product has been deleted.', 'success');
+        }
+      });
+    }
+  </script>
 </body>
 </html>

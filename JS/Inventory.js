@@ -106,6 +106,7 @@ function addProductToGrid(product) {
 }
 
 // Delete product function
+// Delete product function
 function deleteProduct(productId) {
   Swal.fire({
       title: 'Are you sure?',
