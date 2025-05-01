@@ -1,137 +1,127 @@
 <?php
 require_once 'dbConnection.php';
+require_once 'InsertOrder.php';
 
-// Create database connection
 $db = new Database();
 $conn = $db->getConnection();
 
-// Get filter from URL, default is 'All'
-$status_filter = isset($_GET['status']) ? $_GET['status'] : 'All';
-
-// Prepare SQL query with status filter
-if ($status_filter === 'All') {
-    $orderStmt = $conn->prepare("SELECT * FROM orders WHERE user_id = :user_id ORDER BY order_date DESC");
-} else {
-    $orderStmt = $conn->prepare("SELECT * FROM orders WHERE user_id = :user_id AND status = :status ORDER BY order_date DESC");
-    $orderStmt->bindParam(':status', $status_filter);
-}
-
-$orderStmt->bindParam(':user_id', $user_id);
-$orderStmt->execute();
-$orders = $orderStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Close connection
-$conn = null;
+$stmt = $conn->prepare("CALL GetAllOrdersWithDetails()");
+$stmt->execute();
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Order Dashboard</title>
     <style>
-       body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .back-button {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            text-decoration: none;
-            font-size: 16px;
-            border-radius: 5px;
-        }
-        .back-button:hover {
-            background: #45a049;
-        }
-        .order-list {
-            margin-top: 30px;
-        }
-        .order-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: 0.3s;
-            margin-bottom: 20px;
-            padding: 15px;
-        }
-        .order-card:hover {
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        }
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-        }
-        .order-id {
-            font-weight: bold;
-        }
-        .order-details {
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        .order-price {
-            font-weight: bold;
-            color: #4CAF50;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 40px;
+}
+
+.order {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.order h2 {
+    margin-top: 0;
+    color: #34495e;
+}
+
+.order p {
+    margin: 5px 0 15px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.product-list {
+    margin-top: 10px;
+}
+
+.product {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.product:first-child {
+    border-top: none;
+}
+
+.product-details {
+    flex-grow: 1;
+}
+
+.product-details strong {
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+.product-details div {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .product {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
     </style>
 </head>
 <body>
+    <h1>Order Dashboard</h1>
+    <h1><a href="UserDashboard.php">
+    <button style="padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        &larr; Back to Dashboard
+    </button>
+</a><h1>
+    
 
-<div class="header">
-    <h1>Your Orders</h1>
-    <a href="Products.php" class="back-button">Back to Dashboard</a>
-</div>
-
-<!-- Status Filter Dropdown -->
-<form action="OrderDashboard.php" method="GET">
-    <label for="status">Filter by Status:</label>
-    <select name="status" id="status">
-        <option value="All" <?php echo $status_filter === 'All' ? 'selected' : ''; ?>>All</option>
-        <option value="Pending" <?php echo $status_filter === 'Pending' ? 'selected' : ''; ?>>Pending</option>
-        <option value="Shipped" <?php echo $status_filter === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
-        <option value="Delivered" <?php echo $status_filter === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
-        <option value="Cancelled" <?php echo $status_filter === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-    </select>
-    <button type="submit">Filter</button>
-</form>
-
-<div class="order-list">
-    <?php foreach ($orders as $order): ?>
-        <div class="order-card">
-            <div class="order-header">
-                <div class="order-id">Order ID: <?php echo $order['order_id']; ?></div>
-                <div class="order-status"><?php echo htmlspecialchars($order['status']); ?></div>
+    <?php if (count($orders) === 0): ?>
+        <p>No orders found.</p>
+    <?php else: ?>
+        <?php 
+        $currentOrder = null;
+        foreach ($orders as $order): 
+            if ($currentOrder !== $order['order_id']):
+                if ($currentOrder !== null) echo "</div>"; // close previous
+                $currentOrder = $order['order_id'];
+        ?>
+            <div class="order">
+                <h2>Order #<?= $order['order_id'] ?></h2>
+                <p><strong>Date:</strong> <?= $order['order_date'] ?> | <strong>Status:</strong> <?= $order['status'] ?> | <strong>Total:</strong> ₱<?= number_format($order['total_price'], 2) ?></p>
+                <div class="product-list">
+        <?php endif; ?>
+            <div class="product">
+                <div class="product-details">
+                    <div><strong><?= htmlspecialchars($order['product_name']) ?></strong></div>
+                    <div>Quantity: <?= $order['quantity'] ?> | Price: ₱<?= number_format($order['price'], 2) ?></div>
+                </div>
             </div>
-            <div class="order-details">
-                <div><strong>Date:</strong> <?php echo date('Y-m-d H:i:s', strtotime($order['order_date'])); ?></div>
-                <div class="order-price"><strong>Total:</strong> $<?php echo number_format($order['total_price'], 2); ?></div>
-            </div>
-            
-            <!-- Status Change Form -->
-            <form action="OrderDashboard.php" method="POST">
-                <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
-                <label for="status">Change Status:</label>
-                <select name="status" id="status">
-                    <option value="Pending" <?php echo $order['status'] === 'Pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="Shipped" <?php echo $order['status'] === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
-                    <option value="Delivered" <?php echo $order['status'] === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
-                    <option value="Cancelled" <?php echo $order['status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-                </select>
-                <button type="submit">Update Status</button>
-            </form>
+        <?php endforeach; ?>
         </div>
-    <?php endforeach; ?>
-</div>
+    <?php endif; ?>
 
 </body>
 </html>
