@@ -19,7 +19,7 @@
         }
         ?>
 
-        <form method="POST" action="../PHP/registerAdminFunction.php">
+        <form method="POST" action="../PHP/registerUserFunction.php">
             <div class="mb-3">
                 <label class="form-label">Name</label>
                 <input type="text" name="name" class="form-control" required>

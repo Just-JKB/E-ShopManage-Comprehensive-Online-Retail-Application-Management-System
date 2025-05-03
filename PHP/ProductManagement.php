@@ -343,6 +343,51 @@ echo ' -->';
     .catch(error => console.error('Error:', error));
 });
 
+document.getElementById("addProductForm").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch("../PHP/insertFunction.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: "Success!",
+                text: data.message || "Product added successfully!",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                // Optional: Reload to see the new product
+                location.reload();
+            });
+
+            // Optionally reset the form and close modal
+            form.reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
+            modal.hide();
+        } else {
+            Swal.fire({
+                title: "Error!",
+                text: data.message || "An error occurred.",
+                icon: "error"
+            });
+        }
+    })
+    .catch(err => {
+        Swal.fire({
+            title: "Error!",
+            text: "Request failed. Please try again.",
+            icon: "error"
+        });
+        console.error("Fetch error:", err);
+    });
+});
+
     </script>
 </body>
 </html>
