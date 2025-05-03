@@ -39,68 +39,8 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            font-size: .875rem;
-            background-color: #f8f9fa;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 48px 0 0;
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            height: 100vh;
-        }
-
-        .sidebar-header {
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar .nav-link {
-            font-weight: 500;
-            color: #ced4da;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar .nav-link:hover {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar .nav-link.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        main {
-            margin-left: 16.66667%;
-        }
-
-        @media (max-width: 767.98px) {
-            main {
-                margin-left: 0;
-            }
-            .sidebar {
-                position: static;
-                height: auto;
-                padding-top: 0;
-            }
-        }
-
-        .border-left-primary {
-            border-left: 0.25rem solid #4e73df !important;
-        }
-
-        .border-left-success {
-            border-left: 0.25rem solid #1cc88a !important;
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../CSS/AdminDashboard.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -113,30 +53,29 @@ try {
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="index.php">
+                            <a class="nav-link active" href="#">
                                 <i class="fas fa-tachometer-alt me-2"></i>
                                 Dashboard
                             </a>
-                            <li class="nav-item">
-                            <a class="nav-link" href="../PHP/inventoryyy.php">
-                                    <i class="fas fa-boxes me-2"></i>
-                                    Inventory Management
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="../PHP/inventory.php">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    Product Management
-                                </a> 
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="../PHP/users.php">
-                                    <i class="fas fa-users me-2"></i>
-                                    User Management
-                                </a>
-                            </li>
-
-
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../PHP/InventoryManagement.php">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../PHP/ProductManagement.php">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Product Management
+                            </a> 
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../PHP/UserManagement.php">
+                                <i class="fas fa-users me-2"></i>
+                                User Management
+                            </a>
+                        </li>
                         <li class="nav-item mt-5">
                             <a class="nav-link text-danger" href="logout.php">
                                 <i class="fas fa-sign-out-alt me-2"></i>
