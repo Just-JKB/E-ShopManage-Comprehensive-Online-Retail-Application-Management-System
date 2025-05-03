@@ -243,6 +243,107 @@ echo ' -->';
         </div>
     </div>
 
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="editProductForm" method="POST" enctype="multipart/form-data" action="../PHP/updateProduct.php">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editProductId" name="productId">
+
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="editProductName" name="productName" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="editProductDescription" name="productDescription"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" id="editProductPrice" name="productPrice" step="0.01" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="editProductCategory" name="productCategory" required>
+                            <option value="">Select a category</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['category_id'] ?>">
+                                    <?= $category['category_name'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Size</label>
+                        <select class="form-select" id="editProductSize" name="productSize" required>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <input type="text" class="form-control" id="editProductColor" name="productColor" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" class="form-control" id="editProductStock" name="productStock" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Product Image</label>
+                        <input type="file" class="form-control" id="editProductImage" name="productImage">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.btn-warning')) {
+        const card = e.target.closest('.product-card');
+        const productId = card.getAttribute('data-product-id');
+        const productName = card.querySelector('.card-title').textContent;
+        const price = card.querySelector('.card-text').textContent.replace('₱', '');
+
+        // Optional: use dataset or fetch more details via AJAX if needed
+        const product = <?php echo json_encode($products); ?>.find(p => p.product_id == productId);
+
+        if (product) {
+            document.getElementById('editProductId').value = product.product_id;
+            document.getElementById('editProductName').value = product.product_name;
+            document.getElementById('editProductDescription').value = product.description;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductCategory').value = product.category_id;
+            document.getElementById('editProductSize').value = product.size;
+            document.getElementById('editProductColor').value = product.color;
+            document.getElementById('editProductStock').value = product.stock_quantity;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+    }
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
