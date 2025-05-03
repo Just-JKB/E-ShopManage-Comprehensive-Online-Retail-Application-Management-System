@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Login</title>
+    <link rel="stylesheet" href="../CSS/adminLoginn.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-login-container">
+        <div class="admin-icon">
+            <i class="fas fa-user"></i>
+        </div>
+        <h2>User Login</h2>
+
+        <form action="../PHP/userLogin.php" method="POST">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+
+        <div class="register-link">
+            <p>Don't have an account? <a href="../PHP/registerUser.php">Create one</a></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['admin_email'] = $admin['email'];
 
             // Redirect to dashboard
-            header("Location: ../PHP/index.php");
+            header("Location: ../PHP/AdminDashboard.php");
             exit();
         } else {
             // Password doesn't match - show SweetAlert
