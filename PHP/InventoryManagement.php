@@ -63,7 +63,7 @@ try {
                             </a>
                         </li>
                         <li class="nav-item mt-5">
-                            <a class="nav-link text-danger" href="logout.php">
+                            <a class="nav-link text-danger" href="../HTML/adminLogin.html">
                                 <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
                         </li>
