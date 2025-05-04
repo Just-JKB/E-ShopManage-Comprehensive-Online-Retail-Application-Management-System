@@ -10,13 +10,29 @@ $categoryId = !empty($_GET['category_id']) ? $_GET['category_id'] : null;
 $size = !empty($_GET['size']) ? $_GET['size'] : null;
 $minPrice = isset($_GET['min_price']) && $_GET['min_price'] !== '' ? $_GET['min_price'] : null;
 $maxPrice = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? $_GET['max_price'] : null;
+$search = !empty($_GET['search']) ? $_GET['search'] : null;
 
-// Fetch filtered products using stored procedure
-$stmt = $conn->prepare("CALL FilterProducts(:category_id, :size, :min_price, :max_price)");
-$stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
-$stmt->bindParam(':size', $size, PDO::PARAM_STR);
-$stmt->bindParam(':min_price', $minPrice);
-$stmt->bindParam(':max_price', $maxPrice);
+if (!empty($search)) {
+    // Call SearchProducts procedure if search term is provided.
+    // Note: We assume the procedure accepts:
+    // p_product_name, p_category_id, p_size, p_color, p_min_price, p_max_price
+    // Since no color filter is included in the form, we'll pass NULL for p_color.
+    $stmt = $conn->prepare("CALL SearchProducts(:p_product_name, :p_category_id, :p_size, :p_color, :p_min_price, :p_max_price)");
+    $stmt->bindParam(':p_product_name', $search, PDO::PARAM_STR);
+    $stmt->bindParam(':p_category_id', $categoryId, PDO::PARAM_INT);
+    $stmt->bindParam(':p_size', $size, PDO::PARAM_STR);
+    $p_color = null; // No color input from the filter form
+    $stmt->bindParam(':p_color', $p_color, PDO::PARAM_STR);
+    $stmt->bindParam(':p_min_price', $minPrice);
+    $stmt->bindParam(':p_max_price', $maxPrice);
+} else {
+    // If no search term, use the FilterProducts procedure.
+    $stmt = $conn->prepare("CALL FilterProducts(:category_id, :size, :min_price, :max_price)");
+    $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+    $stmt->bindParam(':size', $size, PDO::PARAM_STR);
+    $stmt->bindParam(':min_price', $minPrice);
+    $stmt->bindParam(':max_price', $maxPrice);
+}
 
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -131,7 +147,7 @@ $stmt->closeCursor();
             align-items: center;
         }
 
-        select, input[type="number"] {
+        select, input[type="number"], input[type="text"] {
             padding: 6px;
             border-radius: 4px;
             border: 1px solid #ccc;
@@ -152,7 +168,7 @@ $stmt->closeCursor();
     </div>
 </div>
 
-<!-- Filter Form -->
+<!-- Filter & Search Form -->
 <form method="GET">
     <select name="category_id">
         <option value="">All Categories</option>
@@ -171,10 +187,14 @@ $stmt->closeCursor();
         <option value="S" <?= ($_GET['size'] ?? '') == 'S' ? 'selected' : '' ?>>S</option>
         <option value="M" <?= ($_GET['size'] ?? '') == 'M' ? 'selected' : '' ?>>M</option>
         <option value="L" <?= ($_GET['size'] ?? '') == 'L' ? 'selected' : '' ?>>L</option>
+        <!-- Add other sizes as needed -->
     </select>
 
     <input type="number" name="min_price" placeholder="Min Price" step="0.01" value="<?= htmlspecialchars($_GET['min_price'] ?? '') ?>">
     <input type="number" name="max_price" placeholder="Max Price" step="0.01" value="<?= htmlspecialchars($_GET['max_price'] ?? '') ?>">
+    
+    <!-- Search Bar -->
+    <input type="text" name="search" placeholder="Search product name..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
 
     <button type="submit" class="order-button">Apply Filter</button>
 </form>
