@@ -1,5 +1,5 @@
 <?php
-require_once 'dbConnection.php'; // Make sure the path is correct
+require_once 'dbConnection.php';
 
 $database = new Database();
 $conn = $database->getConnection();
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     Swal.fire({
                         icon: "success",
                         title: "Registration Successful",
-                        text: "User account has been created!",
+                        text: "Your account has been created!",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
                         window.location.href = "../HTML/userLogin.html";
