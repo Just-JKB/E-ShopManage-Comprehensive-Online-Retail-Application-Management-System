@@ -161,7 +161,7 @@ $stmt->closeCursor();
     <?php foreach ($products as $product): ?>
         <div class="product-card" onclick="showReviews(<?= $product['product_id'] ?>)">
             <img src="<?= '../' . htmlspecialchars($product['image_url'] ?? 'images/default-product.jpg') ?>" 
-                 alt="<?= htmlspecialchars($product['product_name']) ?>">
+                alt="<?= htmlspecialchars($product['product_name']) ?>">
             <div class="product-details">
                 <div class="product-name"><?= htmlspecialchars($product['product_name']) ?></div>
                 <div class="product-price">₱<?= number_format($product['price'], 2) ?></div>
