@@ -76,6 +76,13 @@ try {
                                 User Management
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../PHP/TransactionDetails.php">
+                                <i class="fas fa-receipt me-2"></i>
+                                Transaction Details
+                             </a>
+                        </li>
+
                         <li class="nav-item mt-5">
                             <a class="nav-link text-danger" href="../PHP/adminLogout.php">
                                 <i class="fas fa-sign-out-alt me-2"></i>
