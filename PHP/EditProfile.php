@@ -1,14 +1,20 @@
 <?php
+session_start();
 require_once 'dbConnection.php';
 
-// Simulate logged-in user (replace with session logic)
-$user_id = 1;
+// Redirect to login if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../HTML/userLogin.html");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
 
 $db = new Database();
 $conn = $db->getConnection();
 
 // Fetch user data
-$stmt = $conn->prepare("CALL GetUserById(?)");
+$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -20,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'];
 
     // Update user data in the database
-    $stmt = $conn->prepare("CALL UpdateUserInfo(?, ?, ?, ?, ?)");
+    $updateStmt = $conn->prepare("UPDATE users SET name = ?, email = ?, contact_number = ?, address = ? WHERE user_id = ?");
     $updateStmt->execute([$name, $email, $contact_number, $address, $user_id]);
 
     // Redirect back to profile page after update
@@ -33,97 +39,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-    <style>
-       body  {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: #fff;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-        }
-
-        .profile-info {
-            margin-top: 20px;
-        }
-
-        .profile-info label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-            color: #555;
-        }
-
-        .profile-info input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .actions {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .actions button,
-        .actions a {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: #fff;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .actions button:hover,
-        .actions a:hover {
-            background-color: #2980b9;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/EditProfile.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>Edit Profile</h1>
+    <div class="header">
+        <h1>Edit Your Profile</h1>
+        <p>Update your personal information</p>
+    </div>
 
     <form method="POST" action="EditProfile.php">
         <div class="profile-info">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" value="<?= htmlspecialchars($user['name']) ?>" required>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" value="<?= htmlspecialchars($user['name']) ?>" required>
+                <i class="fas fa-user input-icon"></i>
+            </div>
 
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+                <i class="fas fa-envelope input-icon"></i>
+            </div>
 
-            <label for="contact_number">Contact Number</label>
-            <input type="text" id="contact_number" name="contact_number" value="<?= htmlspecialchars($user['contact_number']) ?>" required>
+            <div class="form-group">
+                <label for="contact_number">Contact Number</label>
+                <input type="text" id="contact_number" name="contact_number" value="<?= htmlspecialchars($user['contact_number']) ?>" required>
+                <i class="fas fa-phone input-icon"></i>
+            </div>
 
-            <label for="address">Address</label>
-            <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address']) ?>" required>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address']) ?>" required>
+                <i class="fas fa-home input-icon"></i>
+            </div>
         </div>
 
         <div class="actions">
-            <button type="submit">Save Changes</button>
-            <a href="UserProfile.php" style="padding: 10px 20px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            <a href="UserProfile.php" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
         </div>
     </form>
 </div>
