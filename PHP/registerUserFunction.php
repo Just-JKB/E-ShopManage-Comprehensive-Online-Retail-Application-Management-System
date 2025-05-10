@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Insert user into database
-    $stmt = $conn->prepare("INSERT INTO user (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
     $success = $stmt->execute([$name, $email, $password, $contact_number, $address]);
 
     if ($success) {
