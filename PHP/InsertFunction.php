@@ -63,13 +63,13 @@ function Insert($product_name, $category_id, $size, $color, $price, $stock_quant
             // No product fetched, but insert might still have succeeded
             return [
                 'success' => true,
-                'message' => '✅ Product inserted successfully (no product returned).'
+                'message' => ' Product inserted successfully (no product returned).'
             ];
         }
         return [
             'success' => true,
             'product' => $product,
-            'message' => '✅ Product inserted successfully.'
+            'message' => ' Product inserted successfully.'
         ];
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
