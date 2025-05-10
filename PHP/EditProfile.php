@@ -8,7 +8,7 @@ $db = new Database();
 $conn = $db->getConnection();
 
 // Fetch user data
-$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+$stmt = $conn->prepare("CALL GetUserById(?)");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -16,14 +16,15 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
+    $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
     // Update user data in the database
-    $updateStmt = $conn->prepare("UPDATE users SET name = ?, email = ?, address = ? WHERE user_id = ?");
-    $updateStmt->execute([$name, $email, $address, $user_id]);
+    $stmt = $conn->prepare("CALL UpdateUserInfo(?, ?, ?, ?, ?)");
+    $updateStmt->execute([$name, $email, $contact_number, $address, $user_id]);
 
     // Redirect back to profile page after update
-    header("Location:UserProfile.php");
+    header("Location: UserProfile.php");
     exit();
 }
 ?>
@@ -34,7 +35,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Edit Profile</title>
     <style>
-        /* Add your styles here */
+       body  {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .profile-info {
+            margin-top: 20px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .profile-info input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .actions button,
+        .actions a {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .actions button:hover,
+        .actions a:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -49,6 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+
+            <label for="contact_number">Contact Number</label>
+            <input type="text" id="contact_number" name="contact_number" value="<?= htmlspecialchars($user['contact_number']) ?>" required>
 
             <label for="address">Address</label>
             <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address']) ?>" required>
