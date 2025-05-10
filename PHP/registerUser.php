@@ -17,7 +17,7 @@
         if (isset($_GET['error'])) {
             echo '<div class="alert alert-danger">'.htmlspecialchars($_GET['error']).'</div>';
         }
-      
+      ?>
         <form method="POST" action="../PHP/registerUserFunction.php">
          
             <div class="mb-3">
