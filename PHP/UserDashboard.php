@@ -6,12 +6,38 @@ session_start();
 $db = new Database();
 $conn = $db->getConnection();
 
-// Fetch products
-$productStmt = $conn->query("SELECT * FROM products");
-$products = $productStmt->fetchAll(PDO::FETCH_ASSOC);
+// Get filter values from GET parameters
+$categoryId = !empty($_GET['category_id']) ? $_GET['category_id'] : null;
+$size = !empty($_GET['size']) ? $_GET['size'] : null;
+$minPrice = isset($_GET['min_price']) && $_GET['min_price'] !== '' ? $_GET['min_price'] : null;
+$maxPrice = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? $_GET['max_price'] : null;
+$search = !empty($_GET['search']) ? $_GET['search'] : null;
 
-// Close connection
-$conn = null;
+if (!empty($search)) {
+    // Call SearchProducts procedure if search term is provided.
+    // Note: We assume the procedure accepts:
+    // p_product_name, p_category_id, p_size, p_color, p_min_price, p_max_price
+    // Since no color filter is included in the form, we'll pass NULL for p_color.
+    $stmt = $conn->prepare("CALL SearchProducts(:p_product_name, :p_category_id, :p_size, :p_color, :p_min_price, :p_max_price)");
+    $stmt->bindParam(':p_product_name', $search, PDO::PARAM_STR);
+    $stmt->bindParam(':p_category_id', $categoryId, PDO::PARAM_INT);
+    $stmt->bindParam(':p_size', $size, PDO::PARAM_STR);
+    $p_color = null; // No color input from the filter form
+    $stmt->bindParam(':p_color', $p_color, PDO::PARAM_STR);
+    $stmt->bindParam(':p_min_price', $minPrice);
+    $stmt->bindParam(':p_max_price', $maxPrice);
+} else {
+    // If no search term, use the FilterProducts procedure.
+    $stmt = $conn->prepare("CALL FilterProducts(:category_id, :size, :min_price, :max_price)");
+    $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+    $stmt->bindParam(':size', $size, PDO::PARAM_STR);
+    $stmt->bindParam(':min_price', $minPrice);
+    $stmt->bindParam(':max_price', $maxPrice);
+}
+
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +69,44 @@ $conn = null;
             overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        form {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        select, input[type="number"], input[type="text"] {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
     </style>
 </head>
 <body>
@@ -60,6 +124,38 @@ $conn = null;
         </a>
     </div>
 </div>
+
+
+<!-- Filter & Search Form -->
+<form method="GET">
+    <select name="category_id">
+        <option value="">All Categories</option>
+        <?php
+        // Fetch categories for the filter
+        $catStmt = $db->getConnection()->query("SELECT * FROM categories");
+        while ($cat = $catStmt->fetch(PDO::FETCH_ASSOC)) {
+            $selected = (isset($_GET['category_id']) && $_GET['category_id'] == $cat['category_id']) ? 'selected' : '';
+            echo "<option value='{$cat['category_id']}' $selected>{$cat['category_name']}</option>";
+        }
+        ?>
+    </select>
+
+    <select name="size">
+        <option value="">All Sizes</option>
+        <option value="S" <?= ($_GET['size'] ?? '') == 'S' ? 'selected' : '' ?>>S</option>
+        <option value="M" <?= ($_GET['size'] ?? '') == 'M' ? 'selected' : '' ?>>M</option>
+        <option value="L" <?= ($_GET['size'] ?? '') == 'L' ? 'selected' : '' ?>>L</option>
+        <!-- Add other sizes as needed -->
+    </select>
+
+    <input type="number" name="min_price" placeholder="Min Price" step="0.01" value="<?= htmlspecialchars($_GET['min_price'] ?? '') ?>">
+    <input type="number" name="max_price" placeholder="Max Price" step="0.01" value="<?= htmlspecialchars($_GET['max_price'] ?? '') ?>">
+    
+    <!-- Search Bar -->
+    <input type="text" name="search" placeholder="Search product name..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+
+    <button type="submit" class="order-button">Apply Filter</button>
+</form>
 
 <div class="product-grid">
     <?php foreach ($products as $product): ?>

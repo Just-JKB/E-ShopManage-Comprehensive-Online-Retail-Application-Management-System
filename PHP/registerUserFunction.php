@@ -11,12 +11,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    // Check if the email already exists in users table
+    // Check if the email already exists for user
     $checkStmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $checkStmt->execute([$email]);
 
     if ($checkStmt->rowCount() > 0) {
-        // Email already exists - show error alert
+        // Email already exists
         echo '
         <!DOCTYPE html>
         <html>
@@ -42,8 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Insert into users table
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
+    // Insert user into database
+    $stmt = $conn->prepare("INSERT INTO user (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
     $success = $stmt->execute([$name, $email, $password, $contact_number, $address]);
 
     if ($success) {
