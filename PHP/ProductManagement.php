@@ -150,8 +150,11 @@ echo ' -->';
                         <?php foreach ($products as $product): ?>
                         <div class="col-6 col-md-4 col-lg-3 product-card" data-product-id="<?= $product['product_id'] ?>">
                             <div class="card shadow-sm h-100">
-                                <img src="<?= '../' . htmlspecialchars($product['image_url'] ?? 'images/default-product.jpg') ?>" 
-                                    class="card-img-top" 
+                                <?php
+                                    $imagePath = '../' . ($product['image_url'] ?? 'uploads/default-product.jpg');
+                                ?>
+                                <img src="<?= htmlspecialchars($imagePath) ?>"
+                                    class="card-img-top"
                                     alt="<?= htmlspecialchars($product['product_name'] ?? 'Product image') ?>">
                                 <div class="card-body">
                                     <h5 class="card-title"><?= htmlspecialchars($product['product_name'] ?? 'Unknown Product') ?></h5>
@@ -278,12 +281,10 @@ echo ' -->';
 
                     <div class="mb-3">
                         <label class="form-label">Category</label>
-                        <select class="form-select" id="editProductCategory" name="productCategory" required>
+                        <select class="form-select" id="editProductCategory" name="categoryId" required>
                             <option value="">Select a category</option>
                             <?php foreach ($categories as $category): ?>
-                                <option value="<?= $category['category_id'] ?>">
-                                    <?= $category['category_name'] ?>
-                                </option>
+                                <option value="<?= $category['category_id'] ?>"><?= $category['category_name'] ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

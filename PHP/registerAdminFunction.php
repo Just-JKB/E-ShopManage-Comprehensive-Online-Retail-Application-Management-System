@@ -1,5 +1,5 @@
 <?php
-require_once 'dbConnection.php'; // Make sure path is correct
+require_once 'dbConnection.php';
 
 $database = new Database();
 $conn = $database->getConnection();
@@ -11,17 +11,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    // Check if the email already exists
-    $checkStmt = $conn->prepare("SELECT * FROM admin WHERE email = ?");
-    $checkStmt->execute([$email]);
-
-    if ($checkStmt->rowCount() > 0) {
-        // Email already exists - show error alert
+    // Validate contact number length
+    if (strlen($contact_number) > 11) {
         echo '
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Registration Error</title>
+            <title>Invalid Contact Number</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid Contact Number",
+                        text: "Contact number should not exceed 11 digits.",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        window.location.href = "../PHP/registerAdmin.php";
+                    });
+                });
+            </script>
+        </body>
+        </html>';
+        exit();
+    }
+
+    // Check if the email already exists
+    $checkEmail = $conn->prepare("SELECT * FROM admin WHERE email = ?");
+    $checkEmail->execute([$email]);
+
+    if ($checkEmail->rowCount() > 0) {
+        echo '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Email Already Exists</title>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
         <body>
@@ -32,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         title: "Registration Failed",
                         text: "Email already exists!",
                         confirmButtonColor: "#3085d6"
-                    }).then((result) => {
+                    }).then(() => {
                         window.location.href = "../PHP/registerAdmin.php";
                     });
                 });
@@ -42,12 +68,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Insert admin
-    $stmt = $conn->prepare("INSERT INTO admin (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
+    // Check if contact number already exists
+    $checkContact = $conn->prepare("SELECT * FROM admin WHERE contact_number = ?");
+    $checkContact->execute([$contact_number]);
+
+    if ($checkContact->rowCount() > 0) {
+        echo '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Duplicate Contact Number</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Duplicate Contact Number",
+                        text: "This contact number is already registered.",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        window.location.href = "../PHP/registerAdmin.php";
+                    });
+                });
+            </script>
+        </body>
+        </html>';
+        exit();
+    }
+
+    // Use stored procedure to insert admin
+    $stmt = $conn->prepare("CALL RegisterAdminAccount(?, ?, ?, ?, ?)");
     $success = $stmt->execute([$name, $email, $password, $contact_number, $address]);
+    $stmt->closeCursor(); // Prevents "commands out of sync" error
 
     if ($success) {
-        // Registration successful - show success alert
         echo '
         <!DOCTYPE html>
         <html>
@@ -63,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         title: "Registration Successful",
                         text: "Admin account has been created!",
                         confirmButtonColor: "#3085d6"
-                    }).then((result) => {
+                    }).then(() => {
                         window.location.href = "../HTML/adminLogin.html";
                     });
                 });
@@ -71,7 +127,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </body>
         </html>';
     } else {
-        // Registration failed - show error alert
         echo '
         <!DOCTYPE html>
         <html>
@@ -87,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         title: "Registration Failed",
                         text: "There was an error creating the admin account. Please try again.",
                         confirmButtonColor: "#3085d6"
-                    }).then((result) => {
+                    }).then(() => {
                         window.location.href = "../PHP/registerAdmin.php";
                     });
                 });
@@ -95,5 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </body>
         </html>';
     }
+
     exit();
 }
+?>
