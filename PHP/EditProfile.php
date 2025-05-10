@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'];
 
     // Update user data in the database
-    $updateStmt = $conn->prepare("UPDATE users SET name = ?, email = ?, contact_number = ?, address = ? WHERE user_id = ?");
+    $stmt = $conn->prepare("CALL UpdateUserInfo(?, ?, ?, ?, ?)");
     $updateStmt->execute([$name, $email, $contact_number, $address, $user_id]);
 
     // Redirect back to profile page after update
