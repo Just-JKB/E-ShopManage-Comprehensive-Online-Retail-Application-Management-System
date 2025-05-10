@@ -11,12 +11,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    // Check if the email already exists for user
-    $checkStmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $checkStmt->execute([$email]);
+    // Contact number length validation
+    if (strlen($contact_number) > 11) {
+        echo '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Invalid Contact Number</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid Contact Number",
+                        text: "Contact number should not exceed 11 digits.",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        window.location.href = "../PHP/registerUser.php";
+                    });
+                });
+            </script>
+        </body>
+        </html>';
+        exit();
+    }
 
-    if ($checkStmt->rowCount() > 0) {
-        // Email already exists
+    // Check if the email already exists
+    $checkEmail = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $checkEmail->execute([$email]);
+    if ($checkEmail->rowCount() > 0) {
         echo '
         <!DOCTYPE html>
         <html>
@@ -42,12 +67,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Insert user into database
+    // Check if contact number already exists
+    $checkContact = $conn->prepare("SELECT * FROM users WHERE contact_number = ?");
+    $checkContact->execute([$contact_number]);
+    if ($checkContact->rowCount() > 0) {
+        echo '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Duplicate Contact Number</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Duplicate Contact Number",
+                        text: "This contact number is already registered.",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        window.location.href = "../PHP/registerUser.php";
+                    });
+                });
+            </script>
+        </body>
+        </html>';
+        exit();
+    }
+
+    // Insert user
     $stmt = $conn->prepare("INSERT INTO users (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
     $success = $stmt->execute([$name, $email, $password, $contact_number, $address]);
 
     if ($success) {
-        // Success alert
         echo '
         <!DOCTYPE html>
         <html>
@@ -71,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </body>
         </html>';
     } else {
-        // Error alert
         echo '
         <!DOCTYPE html>
         <html>

@@ -13,10 +13,11 @@ $user_id = $_SESSION['user_id'];
 $db = new Database();
 $conn = $db->getConnection();
 
-// Fetch user data
-$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+$stmt = $conn->prepare("CALL GetUserById(?)");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
 
 // If the form is submitted, update the user's data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -25,14 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    // Update user data in the database
-    $updateStmt = $conn->prepare("UPDATE users SET name = ?, email = ?, contact_number = ?, address = ? WHERE user_id = ?");
-    $updateStmt->execute([$name, $email, $contact_number, $address, $user_id]);
+    // Call the stored procedure to update user data
+    $updateStmt = $conn->prepare("CALL UpdateUserInfo(?, ?, ?, ?, ?)");
+    $updateStmt->execute([$user_id, $name, $email, $contact_number, $address]);
 
     // Redirect back to profile page after update
     header("Location: UserProfile.php");
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>

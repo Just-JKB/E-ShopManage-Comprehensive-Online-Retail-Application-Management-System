@@ -142,15 +142,6 @@ if (!$hasStatusColumn) {
                                                 <span class="badge rounded-pill <?= $badgeClass ?>"><?= ucfirst($status) ?></span>
                                             </td>
                                             <td class="action-buttons">
-                                                <?php if ($status !== 'banned'): ?>
-                                                    <button class="btn btn-sm btn-warning ban-user" data-user-id="<?= $user['user_id'] ?>">
-                                                        <i class="fas fa-ban"></i> Ban
-                                                    </button>
-                                                <?php else: ?>
-                                                    <button class="btn btn-sm btn-success unban-user" data-user-id="<?= $user['user_id'] ?>">
-                                                        <i class="fas fa-check"></i> Unban
-                                                    </button>
-                                                <?php endif; ?>
                                                 <button class="btn btn-sm btn-danger delete-user" data-user-id="<?= $user['user_id'] ?>">
                                                     <i class="fas fa-trash"></i> Delete
                                                 </button>
