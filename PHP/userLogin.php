@@ -6,11 +6,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Connect to database
     $database = new Database();
     $conn = $database->getConnection();
 
-    // Check user credentials
     $query = "SELECT * FROM users WHERE email = :email LIMIT 1";
     $stmt = $conn->prepare($query);
     $stmt->bindParam(":email", $email);
@@ -19,25 +17,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->rowCount() > 0) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Check password
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
+       if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['user_id']; // ← fix here
             $_SESSION['user_email'] = $user['email'];
 
-            // Redirect to user dashboard
+            // Update last_login and logged_in status
+            $updateQuery = "UPDATE users SET last_login = NOW(), logged_in = 1 WHERE user_id = :id"; // ← fix here
+            $updateStmt = $conn->prepare($updateQuery);
+            $updateStmt->bindParam(":id", $user['user_id']);
+            $updateStmt->execute();
+
             header("Location: ../PHP/UserDashboard.php");
             exit();
         } else {
-            // Incorrect password
             showAlert("Login Failed", "Invalid password. Please try again.");
         }
     } else {
-        // No user found with that email
         showAlert("Login Failed", "No user found with that email. Please check or register.");
     }
 }
 
-// Function to show SweetAlert error
 function showAlert($title, $message) {
     echo <<<HTML
     <!DOCTYPE html>
