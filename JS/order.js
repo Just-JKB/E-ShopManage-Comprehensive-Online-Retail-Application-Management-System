@@ -1,84 +1,56 @@
-// Open the order modal when a product is ordered
-function orderNow(productId, productName, price) {
+// order.js
+
+// Function to open the order modal with product details
+function orderNow(productId, productName, productPrice) {
     document.getElementById('modalProductId').value = productId;
     document.getElementById('modalProductName').value = productName;
-    document.getElementById('modalProductPrice').value = price;
-    document.getElementById('orderModal').style.display = 'flex';
+    document.getElementById('modalProductPrice').value = productPrice;
+    document.getElementById('orderModal').style.display = 'block';
 }
 
-// Close the order modal
+// Function to close the order modal
 function closeModal() {
     document.getElementById('orderModal').style.display = 'none';
+    document.getElementById('orderForm').reset();
 }
 
-// Open the review modal and show the reviews for the product
-function openReviewModal(productId) {
-    // Simulated reviews – replace this with AJAX fetch from PHP/DB
-    const sampleReviews = {
-        1: ["Great quality!", "Worth the price."],
-        2: ["Fast delivery!", "Very useful product."],
-        3: ["Not what I expected.", "Customer service helped though."],
-    };
+// Handle form submission
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("orderForm");
 
-    const reviews = sampleReviews[productId] || ["No reviews yet."];
-    const reviewHTML = reviews.map(review => `<div class="review-item">${review}</div>`).join('');
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    document.getElementById('reviewList').innerHTML = reviewHTML;
-    document.getElementById('reviewModal').style.display = 'flex';
-}
+        const productId = document.getElementById("modalProductId").value;
+        const quantity = document.getElementById("quantity").value;
+        const paymentMethod = document.getElementById("paymentMethod").value;
 
-// Close the review modal
-function closeReviewModal() {
-    document.getElementById('reviewModal').style.display = 'none';
-}
-
-// Handle the order form submission
-document.getElementById('orderForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const productId = parseInt(document.getElementById('modalProductId').value);
-    const productName = document.getElementById('modalProductName').value;
-    const price = parseFloat(document.getElementById('modalProductPrice').value);
-    const quantity = parseInt(document.getElementById('quantity').value);
-    const paymentMethod = document.getElementById('paymentMethod').value;
-
-    if (!paymentMethod || quantity < 1) {
-        alert("Please fill all fields correctly.");
-        return;
-    }
-
-    const total = price * quantity;
-
-    const orderData = {
-        user_id: 1, // Replace this with session user ID dynamically
-        total_price: total,
-        payment_method: paymentMethod,
-        order_items: [
-            {
-                product_id: productId,
-                quantity: quantity,
-                price: price
-            }
-        ]
-    };
-
-    fetch('PlaceOrder.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        closeModal();
-        if (data.success) {
-            alert(`${productName} ordered successfully! Order ID: ${data.order_id}`);
-            window.location.href = 'OrderDashboard.php';
-        } else {
-            alert('Order failed: ' + data.error);
+        if (!paymentMethod) {
+            alert("Please select a payment method.");
+            return;
         }
-    })
-    .catch(error => {
-        closeModal();
-        alert('Order error: ' + error);
+
+        const formData = new FormData();
+        formData.append("product_id", productId);
+        formData.append("quantity", quantity);
+        formData.append("payment_method", paymentMethod);
+
+        fetch("placeOrder.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ Order placed successfully!");
+                closeModal();
+            } else {
+                alert("❌ Order failed: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("❌ An error occurred while placing the order.");
+        });
     });
 });
