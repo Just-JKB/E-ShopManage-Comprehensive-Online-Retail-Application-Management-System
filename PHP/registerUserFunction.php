@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $contact_number = $_POST['contact_number'];
     $address = $_POST['address'];
 
-    // Validate contact number length
+    // Contact number length validation
     if (strlen($contact_number) > 11) {
         echo '
         <!DOCTYPE html>
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         text: "Contact number should not exceed 11 digits.",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
-                        window.location.href = "../PHP/registerAdmin.php";
+                        window.location.href = "../PHP/registerUser.php";
                     });
                 });
             </script>
@@ -39,15 +39,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Check if the email already exists
-    $checkEmail = $conn->prepare("SELECT * FROM admin WHERE email = ?");
+    $checkEmail = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $checkEmail->execute([$email]);
-
     if ($checkEmail->rowCount() > 0) {
         echo '
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Email Already Exists</title>
+            <title>Registration Error</title>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
         <body>
@@ -59,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         text: "Email already exists!",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
-                        window.location.href = "../PHP/registerAdmin.php";
+                        window.location.href = "../PHP/registerUser.php";
                     });
                 });
             </script>
@@ -69,9 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Check if contact number already exists
-    $checkContact = $conn->prepare("SELECT * FROM admin WHERE contact_number = ?");
+    $checkContact = $conn->prepare("SELECT * FROM users WHERE contact_number = ?");
     $checkContact->execute([$contact_number]);
-
     if ($checkContact->rowCount() > 0) {
         echo '
         <!DOCTYPE html>
@@ -89,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         text: "This contact number is already registered.",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
-                        window.location.href = "../PHP/registerAdmin.php";
+                        window.location.href = "../PHP/registerUser.php";
                     });
                 });
             </script>
@@ -98,10 +96,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Use stored procedure to insert admin
-    $stmt = $conn->prepare("CALL RegisterAdminAccount(?, ?, ?, ?, ?)");
+    // Insert user
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, contact_number, address) VALUES (?, ?, ?, ?, ?)");
     $success = $stmt->execute([$name, $email, $password, $contact_number, $address]);
-    $stmt->closeCursor(); // Prevents "commands out of sync" error
 
     if ($success) {
         echo '
@@ -117,10 +114,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     Swal.fire({
                         icon: "success",
                         title: "Registration Successful",
-                        text: "Admin account has been created!",
+                        text: "Your account has been created!",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
-                        window.location.href = "../HTML/adminLogin.html";
+                        window.location.href = "../HTML/userLogin.html";
                     });
                 });
             </script>
@@ -140,17 +137,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     Swal.fire({
                         icon: "error",
                         title: "Registration Failed",
-                        text: "There was an error creating the admin account. Please try again.",
+                        text: "There was an error creating the user account. Please try again.",
                         confirmButtonColor: "#3085d6"
                     }).then(() => {
-                        window.location.href = "../PHP/registerAdmin.php";
+                        window.location.href = "../PHP/registerUser.php";
                     });
                 });
             </script>
         </body>
         </html>';
     }
-
     exit();
 }
 ?>
